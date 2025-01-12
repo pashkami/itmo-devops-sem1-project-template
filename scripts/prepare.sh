@@ -33,7 +33,8 @@ echo "Создание таблицы prices в базе данных $POSTGRES_
 
 PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -h $POSTGRES_HOST -p $POSTGRES_PORT -d $POSTGRES_DB -c 
 "
-CREATE TABLE IF NOT EXISTS prices (
+CREATE TABLE IF NOT EXISTS prices 
+(
     id SERIAL PRIMARY KEY,           -- Автоматически увеличиваемый идентификатор
     created_at DATE NOT NULL,        -- Дата создания продукта
     name VARCHAR(255) NOT NULL,      -- Название продукта
