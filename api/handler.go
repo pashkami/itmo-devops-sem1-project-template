@@ -123,7 +123,7 @@ func UploadPricesHandler(db *sql.DB) http.HandlerFunc {
 				}
 
 				// Записываем в базу
-				_, err = db.Exec("INSERT INTO prices (product_id, created_at, name, category, price) VALUES ($1, $2, $3, $4, $5)",
+				_, err = db.Exec("INSERT INTO prices (id, created_at, name, category, price) VALUES ($1, $2, $3, $4, $5)",
 					productID, createdAt, name, category, price)
 				if err != nil {
 					http.Error(w, "Failed to insert data into database", http.StatusInternalServerError)
@@ -171,7 +171,7 @@ func DownloadPricesHandler(db *sql.DB) http.HandlerFunc {
 		defer writer.Flush()
 
 		// Запрос данных из базы
-		rows, err := db.Query("SELECT product_id, created_at, name, category, price FROM prices")
+		rows, err := db.Query("SELECT id, created_at, name, category, price FROM prices")
 		if err != nil {
 			http.Error(w, "Failed to query database", http.StatusInternalServerError)
 			return
