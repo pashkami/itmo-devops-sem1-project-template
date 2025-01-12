@@ -17,4 +17,4 @@ fi
 echo "Идёт сборка приложения..."
 go build -o app ./main.go
 
-echo "Приложение запущено с PID: $!"
+echo "Приложение запущено с PID: $PID"
