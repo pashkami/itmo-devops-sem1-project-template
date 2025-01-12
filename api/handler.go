@@ -10,6 +10,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"bytes"
+	"log"
 )
 
 // PriceData используется и при чтении CSV, и при выгрузке данных из БД.
@@ -38,34 +40,28 @@ func UploadPricesHandler(db *sql.DB) http.HandlerFunc {
 
 		// Обработка загружаемого архива
 		file, _, err := r.FormFile("file")
-		if err != nil {
-			http.Error(w, "Failed to read file", http.StatusBadRequest)
-			return
-		}
-		defer file.Close()
+        if err != nil {
+            log.Printf("Error retrieving file: %v", err)
+            http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
+            return
+        }
+        defer file.Close()
 
-		// Временный файл для хранения загружаемого архива
-		tempFile, err := os.CreateTemp("", "uploaded-*.zip")
-		if err != nil {
-			http.Error(w, "Failed to create temporary file", http.StatusInternalServerError)
-			return
-		}
-		defer os.Remove(tempFile.Name())
+        // Считываем ZIP-архив в буфер
+        tempFiles := &bytes.Buffer{}
+        if _, err := io.Copy(tempFiles, file); err != nil {
+            log.Printf("Error reading file: %v", err)
+            http.Error(w, "Failed to read file", http.StatusInternalServerError)
+            return
+        }
 
-		_, err = io.Copy(tempFile, file)
-		if err != nil {
-			http.Error(w, "Failed to save uploaded file", http.StatusInternalServerError)
-			return
-		}
-		tempFile.Close()
-
-		// Распаковываем zip
-		zipReader, err := zip.OpenReader(tempFile.Name())
-		if err != nil {
-			http.Error(w, "Failed to unzip file", http.StatusInternalServerError)
-			return
-		}
-		defer zipReader.Close()
+        // Открываем ZIP-архив из буфера
+        zipReader, err := zip.NewReader(bytes.NewReader(tempFiles.Bytes()), int64(tempFiles.Len()))
+        if err != nil {
+            log.Printf("Error opening zip: %v", err)
+            http.Error(w, "Invalid zip file", http.StatusBadRequest)
+            return
+        }
 
 		var totalItems int
 		var totalCategories int
