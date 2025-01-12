@@ -47,6 +47,14 @@ func UploadPricesHandler(db *sql.DB) http.HandlerFunc {
         }
         defer file.Close()
 
+        buf := make([]byte, 512) // Считываем первые 512 байт для определения типа
+        _, err = file.Read(buf)
+        if err != nil {
+            log.Printf("Error reading file header: %v", err)
+            http.Error(w, "Failed to read file header", http.StatusInternalServerError)
+            return
+        }
+
         // Считываем ZIP-архив в буфер
         tempFiles := &bytes.Buffer{}
         if _, err := io.Copy(tempFiles, file); err != nil {
