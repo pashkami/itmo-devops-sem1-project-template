@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 # Для прерывания скрипта в случае возникновения ошибок
 set -e
@@ -25,16 +25,15 @@ echo "Зависимости установлены"
 
 if ! command -v psql &> /dev/null
 then
-    echo "Клиент PostgreSQL не установлен.
+    echo "Клиент PostgreSQL не установлен."
+    exit 1
 fi
 
 echo "Подключение к PostgreSQL"
 echo "Создание таблицы prices в базе данных $POSTGRES_DB..."
 
-PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -h $POSTGRES_HOST -p $POSTGRES_PORT -d $POSTGRES_DB -c 
-"
-CREATE TABLE IF NOT EXISTS prices 
-(
+PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -h $POSTGRES_HOST -p $POSTGRES_PORT -d $POSTGRES_DB -c "
+CREATE TABLE IF NOT EXISTS prices (
     id SERIAL PRIMARY KEY,           -- Автоматически увеличиваемый идентификатор
     created_at DATE NOT NULL,        -- Дата создания продукта
     name VARCHAR(255) NOT NULL,      -- Название продукта
