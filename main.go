@@ -7,9 +7,8 @@ import (
 
     "github.com/gorilla/mux"
     "github.com/joho/godotenv"
-    
-	"project_sem/api"
-	"project_sem/models"
+    "project_sem/api"
+    "project_sem/models"
 )
 
 func main() {
@@ -26,10 +25,9 @@ func main() {
     dbName := os.Getenv("POSTGRES_DB")
 
     // Формирование строки подключения
-    dsn := "postgres://" + dbUser + ":" + dbPassword + "@" + dbHost + ":" + dbPort + "/" + dbName + "?sslmode=disable"
-
-    // Подключение к базе данных
-    db, err := models.ConnectDB(dsn)
+    pl := "postgres://" + dbUser + ":" + dbPassword + "@" + dbHost + ":" + dbPort + "/" + dbName + "?sslmode=disable"
+    
+    db, err := models.ConnectDB(pl)
     if err != nil {
         log.Fatalf("Failed to connect to the database: %v", err)
     }
@@ -37,10 +35,9 @@ func main() {
 
     // Создание роутера и запуск сервера
     router := mux.NewRouter()
-    router.HandleFunc("/api/v0/prices", api.UploadPricesHandler(db)).Methods("POST")
-    router.HandleFunc("/api/v0/prices", api.DownloadPricesHandler(db)).Methods("GET")
+    router.HandleFunc("/api/v0/prices", handlers.UploadPricesHandler(db)).Methods("POST")
+    router.HandleFunc("/api/v0/prices", handlers.DownloadPricesHandler(db)).Methods("GET")
 
     log.Println("Server started on :8080")
     log.Fatal(http.ListenAndServe(":8080", router))
 }
-
