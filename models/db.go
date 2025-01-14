@@ -22,7 +22,7 @@ func ConnectDB(dataSourceName string) (*sql.DB, error) {
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS prices (
             id SERIAL PRIMARY KEY,
-            created_at DATE NOT NULL,
+            created_at timestamp NOT NULL,
             name VARCHAR(255) NOT NULL,
             category VARCHAR(255) NOT NULL,
             price DECIMAL(10, 2) NOT NULL

@@ -8,7 +8,6 @@ import (
     "encoding/json"
     "io"
     "log"
-    "math"
     "net/http"
     "path/filepath"
     "strconv"
@@ -142,7 +141,7 @@ func UploadPricesHandler(db *sql.DB) http.HandlerFunc {
 
         for _, rec := range validRecords {
             _, err := tr.Exec(`
-                INSERT INTO prices (id, created_at, name, category, price)
+                INSERT INTO prices (created_at, name, category, price)
                 VALUES ($1, $2, $3, $4, $5)
                 ON CONFLICT (id) DO NOTHING
             `, rec.ID, rec.Createtdb, rec.Name, rec.Category, rec.Price)
@@ -176,7 +175,7 @@ func UploadPricesHandler(db *sql.DB) http.HandlerFunc {
         resp := PostResponse{
             TotalItems:      completedRecieves,
             TotalCategories: dbCategories,
-            TotalPrice:      math.Round(dbTotalPrice*100) / 100,
+            TotalPrice:      dbTotalPrice,
         }
 
         w.Header().Set("Content-Type", "application/json")
@@ -204,6 +203,7 @@ func DownloadPricesHandler(db *sql.DB) http.HandlerFunc {
             http.Error(w, "Failed to retrieve data", http.StatusInternalServerError)
             return
         }
+        rows.Close()
 
         var allPrices []LoadedPrice
 
@@ -232,7 +232,7 @@ func DownloadPricesHandler(db *sql.DB) http.HandlerFunc {
             http.Error(w, "Failed to read rows", http.StatusInternalServerError)
             return
         }
-        rows.Close()
+        
 
         csvBuffer := &bytes.Buffer{}
         writer := csv.NewWriter(csvBuffer)
